@@ -20,7 +20,7 @@ export default class CerateTransactions1589290141097
             default: 'uuid_generate_v4()',
           },
           { name: 'title', type: 'varchar' },
-          { name: 'value', type: 'numeric' },
+          { name: 'value', type: 'decimal' },
           { name: 'type', type: 'varchar' },
           { name: 'category_id', type: 'uuid', isNullable: true },
           {

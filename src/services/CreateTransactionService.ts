@@ -1,8 +1,9 @@
-import { getRepository, getCustomRepository } from 'typeorm';
+import { getCustomRepository } from 'typeorm';
 import AppError from '../errors/AppError';
 
 import Transaction from '../models/Transaction';
 import CategoriesRepository from '../repositories/CategoriesRepository';
+import TransactionRepository from '../repositories/TransactionsRepository';
 
 interface RequestDTO {
   title: string;
@@ -18,11 +19,18 @@ class CreateTransactionService {
     type,
     category,
   }: RequestDTO): Promise<Transaction> {
-    const transactionRepository = getRepository(Transaction);
+    const transactionRepository = getCustomRepository(TransactionRepository);
     const categoriesRepository = getCustomRepository(CategoriesRepository);
 
     if (type.toLowerCase() !== 'income' && type.toLowerCase() !== 'outcome')
       throw new AppError('Transaction type is invalid');
+
+    if (type === 'outcome') {
+      const { total } = await transactionRepository.getBalance();
+      if (total < value) {
+        throw new AppError('The value is less than total income');
+      }
+    }
 
     let categoryNew = await categoriesRepository.findByTitle(category);
 
